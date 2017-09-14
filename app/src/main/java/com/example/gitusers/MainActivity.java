@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private RecyclerView usersRecyclerView;
     private List<User> mItems = new ArrayList<>();
-
+    ProgressBar progressBar;
    Intent intent;
 
     //private String method, text;
@@ -42,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
        usersRecyclerView = (RecyclerView) findViewById(R.id.users_gallery_recycler);
         usersRecyclerView.setLayoutManager(new GridLayoutManager(this, 1));
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        new FetchItemTask().execute();
 
         setUpAdapter();
     }
@@ -54,13 +57,13 @@ public class MainActivity extends AppCompatActivity {
     private class userHolder extends RecyclerView.ViewHolder {
         private ImageView imageItemView;
         private TextView userLogin;
-        private ConstraintLayout CL;
+        private ConstraintLayout cl;
 
         public userHolder(View itemView) {
             super(itemView);
             imageItemView = (ImageView) itemView.findViewById(R.id.ivUser_avatar);
-            userLogin =(TextView) itemView.findViewById(R.id.etLogin);
-            CL=(ConstraintLayout) itemView.findViewById(R.id.cl);
+            userLogin =(TextView) itemView.findViewById(R.id.tvLogin);
+            cl=(ConstraintLayout) itemView.findViewById(R.id.CL);
 
         }
     }
@@ -87,23 +90,23 @@ public class MainActivity extends AppCompatActivity {
             String login=mGalleryItems.get(position).getLogin();
             holder.userLogin.setText(login);
 
-            holder.CL.setOnClickListener(new View.OnClickListener() {
+            holder.cl.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
-
                     String login=mGalleryItems.get(position).getLogin();
-                    String avatar=mGalleryItems.get(position).getAvatarUrl();
+                    String avatatUrl=mGalleryItems.get(position).getAvatarUrl();
 
-
+                    //Toast.makeText(GalleryActivity.this,url, Toast.LENGTH_SHORT).show();
                     intent = new Intent(MainActivity.this, UserInfoActivity.class);
                     intent.putExtra("login",login);
-                    intent.putExtra("avatarUrl",avatar);
+                    intent.putExtra("avatar_url",avatatUrl);
 
 
                     startActivity(intent);
                 }
             });
+
+
         }
 
         @Override
@@ -113,17 +116,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class FetchItemTask extends AsyncTask<Void, Void, List<User>> {
+        @Override
+        protected void onPreExecute() {
+            progressBar.setVisibility(View.VISIBLE);
 
-
+        }
         @Override
         protected List<User> doInBackground(Void... voids) {
-            return new Fetcher().fetchItems(method, text);
+            return new Fetcher().fetchItems();
         }
 
         @Override
         protected void onPostExecute(List<User> users) {
             mItems = users;
             setUpAdapter();
+            progressBar.setVisibility(View.GONE);
         }
     }
 

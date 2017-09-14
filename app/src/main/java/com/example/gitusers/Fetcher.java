@@ -25,7 +25,6 @@ import okhttp3.Response;
 
 public class Fetcher {
     private static final String TAG = "Fetcher";
-    //private static final String API_KEY = "5a5bfa35ca6eee70a392c4dd5ab4d81c";
 
     public String getJSONString(String URLSpec) throws IOException {
 
@@ -39,23 +38,18 @@ public class Fetcher {
         return result;
     }
 
-    public List<gallery_item> fetchItems(String method, String text) {
-        List<gallery_item> itemsList = new ArrayList<>();
+    public List<User> fetchItems() {
+        List<User> itemsList = new ArrayList<>();
         try {
-            String url = Uri.parse("https://api.flickr.com/services/rest/")
-                    .buildUpon()
-                    .appendQueryParameter("method", method)
-                    .appendQueryParameter("text", text)
-                    .appendQueryParameter("per_page", "500")
-                    .appendQueryParameter("api_key", API_KEY)
-                    .appendQueryParameter("format", "json")
-                    .appendQueryParameter("nojsoncallback", "1")
-                    .appendQueryParameter("extras", "owner_name,url_s,url_m")
-                    .build().toString();
+            String url = "https://api.github.com/users";
+
 
             String jsonString = getJSONString(url);
-            JSONObject jsonBody = new JSONObject(jsonString);
-            parseItems(itemsList, jsonBody);
+            //Log.e("url", url);
+            //Log.e("jsonString", jsonString);
+
+
+            parseItems(itemsList, jsonString);
 
         } catch (IOException e) {
             Log.e(TAG, "Ощибка загрузки данных", e);
@@ -65,25 +59,16 @@ public class Fetcher {
         return itemsList;
     }
 
-    private void parseItems(List<gallery_item> items, JSONObject jsonBody) throws IOException, JSONException {
-        JSONObject photosJSONObject = jsonBody.getJSONObject("photos");
-        JSONArray photoJSONArray = photosJSONObject.getJSONArray("photo");
+    private void parseItems(List<User> items, String fromServer) throws IOException, JSONException {
+        JSONArray usersJSONArray = new JSONArray(fromServer);
 
-        for (int i = 0; i < photoJSONArray.length(); i++) {
-            JSONObject photoJSONObject = photoJSONArray.getJSONObject(i);
-            gallery_item item = new gallery_item();
-            item.setId(photoJSONObject.getString("id"));
-            item.setCaption(photoJSONObject.getString("title"));
-            item.setOwner_name(photoJSONObject.getString("ownername"));
-
-
-            if (!photoJSONObject.has("url_s")) continue;
-            item.setUrls(photoJSONObject.getString("url_s"));
-
-            if (!photoJSONObject.has("url_m")) continue;
-            item.setUrlm(photoJSONObject.getString("url_m"));
-
-
+        for (int i = 0; i < usersJSONArray.length(); i++) {
+            JSONObject userJSONObject = usersJSONArray.getJSONObject(i);
+            User item = new User();
+            item.setLogin(userJSONObject.getString("login"));
+            //Log.e("login ", item.getLogin());
+            item.setAvatarUrl(userJSONObject.getString("avatar_url"));
+            //Log.e("url_avatar ", item.getAvatarUrl());
             items.add(item);
         }
 
