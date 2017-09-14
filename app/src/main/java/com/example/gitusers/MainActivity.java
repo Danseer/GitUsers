@@ -3,6 +3,7 @@ package com.example.gitusers;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -53,11 +54,14 @@ public class MainActivity extends AppCompatActivity {
     private class userHolder extends RecyclerView.ViewHolder {
         private ImageView imageItemView;
         private TextView userLogin;
+        private ConstraintLayout CL;
 
         public userHolder(View itemView) {
             super(itemView);
             imageItemView = (ImageView) itemView.findViewById(R.id.ivUser_avatar);
             userLogin =(TextView) itemView.findViewById(R.id.etLogin);
+            CL=(ConstraintLayout) itemView.findViewById(R.id.cl);
+
         }
     }
 
@@ -81,9 +85,9 @@ public class MainActivity extends AppCompatActivity {
             User GalleryItem = mGalleryItems.get(position);
             Picasso.with(MainActivity.this).load(GalleryItem.getAvatarUrl()).into(holder.imageItemView);
             String login=mGalleryItems.get(position).getLogin();
-            userLogin.setText(login);
+            holder.userLogin.setText(login);
 
-            holder.imageItemView.setOnClickListener(new View.OnClickListener() {
+            holder.CL.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
